@@ -7,7 +7,7 @@ $('#restoreFile').onchange=async event=>{const file=event.target.files[0];if(!fi
 
 let offlineCheckSequence=0;
 function paintOfflineProgress(completed,total,label){const bar=$('#offlineProgress'),caption=$('#offlineProgressText');bar.max=total;bar.value=Math.max(0,Math.min(total,completed));bar.dataset.state='active';caption.textContent=label+' '+completed+' / '+total+' · '+Math.floor(completed/total*100)+'%'}
-function receiveOfflineProgress(data){if(data.type!=='OFFLINE_PROGRESS'||data.version!=='lanyu-shell-v20'||$('#offlineStatus').dataset.ready==='true')return;paintOfflineProgress(data.completed,data.total,data.stage==='save'?'正在保存并校验':'正在下载离线文件')}
+function receiveOfflineProgress(data){if(data.type!=='OFFLINE_PROGRESS'||data.version!=='lanyu-shell-v24'||$('#offlineStatus').dataset.ready==='true')return;paintOfflineProgress(data.completed,data.total,data.stage==='save'?'正在保存并校验':'正在下载离线文件')}
 if('serviceWorker'in navigator)navigator.serviceWorker.addEventListener('message',event=>receiveOfflineProgress(event.data||{}));
 async function offlineProbe(){const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),1500);try{const response=await fetch('./__offline_status__?t='+Date.now(),{cache:'no-store',signal:abort.signal});if(!response.ok)throw Error('离线启动程序尚未接管');return await response.json()}finally{clearTimeout(timer)}}
 async function repairCache(){const worker=navigator.serviceWorker.controller;if(!worker)throw Error('离线启动程序尚未接管，请联网关闭后重新打开');return await new Promise((resolve,reject)=>{const channel=new MessageChannel(),timer=setTimeout(()=>{channel.port1.close();reject(Error('修复超时，请确认电脑服务正在运行'))},60000);channel.port1.onmessage=event=>{if(event.data.type==='OFFLINE_PROGRESS'){receiveOfflineProgress(event.data);return}clearTimeout(timer);channel.port1.close();event.data.error?reject(Error(event.data.error)):resolve(event.data)};worker.postMessage({type:'REPAIR_OFFLINE_CACHE'},[channel.port2])})}
@@ -15,16 +15,16 @@ async function checkOffline(repair=false){
  const sequence=++offlineCheckSequence,status=$('#offlineStatus'),details=$('#offlineDetails'),button=$('#repairOffline');button.disabled=true;status.dataset.ready='false';status.textContent=repair?'正在补全离线文件…':'正在检查本机离线读取…';details.textContent='';$('#offlineProgress').removeAttribute('value');$('#offlineProgress').dataset.state='active';$('#offlineProgressText').textContent=repair?'准备下载离线文件…':'正在核对本机文件…';
  try{
   if(!window.isSecureContext||!('serviceWorker'in navigator))throw Error('请通过已信任的 HTTPS 记账地址打开');
-  let registration=await navigator.serviceWorker.getRegistration('./');
+  let lastUpdateError='';let registration=await navigator.serviceWorker.getRegistration('./');
   if(!registration)registration=await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
-  else if(navigator.onLine)registration.update().catch(()=>{});
-  let result,lastError;
-  for(let attempt=0;attempt<30;attempt++){
+  else if(navigator.onLine)registration.update().catch(err=>{lastUpdateError=err.message});
+  let result,lastError;const deadline=Date.now()+60000;
+  for(let attempt=0;Date.now()<deadline;attempt++){
    if(sequence!==offlineCheckSequence)return;
-   if(navigator.serviceWorker.controller){try{result=await offlineProbe();if(result.version==='lanyu-shell-v20')break}catch(err){lastError=err}}
+   if(navigator.serviceWorker.controller){try{result=await offlineProbe();if(result.version==='lanyu-shell-v24')break;if(result.ready&&/^lanyu-shell-v\d+$/.test(result.version)&&Number(result.version.split('v').at(-1))>24)break}catch(err){lastError=err}}
    await new Promise(resolve=>setTimeout(resolve,200));
   }
-  if(!result||result.version!=='lanyu-shell-v20')throw Error('离线启动程序未完成更新，请联网关闭后重新打开一次');
+  if(!result||result.version!=='lanyu-shell-v24'){if(registration.installing)throw Error('新版还在下载，请保持联网后重试');$('#reloadOfflineApp').hidden=false;throw Error(lastUpdateError?'更新下载失败，请确认手机与电脑同 Wi-Fi 后重试':'请点“重新打开完成更新”，加载已安装的新版')}
   if(repair)result=await repairCache();
   paintOfflineProgress(result.total-result.missing.length,result.total,'已缓存');
   if(!result.ready)throw Error('缺少 '+result.missing.length+' 个离线文件，请点“检查并修复离线”');
@@ -36,4 +36,6 @@ async function checkOffline(repair=false){
  }catch(err){if(sequence===offlineCheckSequence){$('#offlineProgress').dataset.state='error';$('#offlineProgressText').textContent='未完成 · 可联网后重试';status.textContent='离线未就绪：'+err.message;details.textContent='请保留现有应用和账单数据，联网后在这里重试。'}}finally{if(sequence===offlineCheckSequence)button.disabled=false}
 }
 $('#repairOffline').onclick=()=>checkOffline(true);
+$('#reloadOfflineApp').onclick=()=>{if(amount||editingId){if(!confirm('当前有未保存的账单草稿，重新打开会清空草稿。是否继续？'))return}location.reload()};
 checkOffline();
+if('serviceWorker'in navigator)navigator.serviceWorker.addEventListener('controllerchange',()=>{$('#reloadOfflineApp').hidden=false;$('#offlineDetails').textContent='离线启动程序已更新，请点“重新打开完成更新”。已保存账单会保留。'});
