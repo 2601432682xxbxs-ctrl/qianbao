@@ -69,3 +69,6 @@ dialog::backdrop{background:#293d4d26;backdrop-filter:blur(5px);-webkit-backdrop
 :root[data-theme=white] .cat.selected,:root[data-theme=white] .sub-chip.selected{background:#e6eef8b8;border-color:#fff;color:#0059c7}
 :root[data-theme=white] .save-button{background:linear-gradient(155deg,#1687ff,#007aff);color:#fff;border-color:#ffffff88;box-shadow:inset 0 1px 0 #ffffff55,0 4px 14px #007aff18}
 :root[data-theme=white] dialog{background:rgba(250,250,252,.88)}
+
+.photo-picker{display:flex;align-items:center;gap:10px;margin-top:14px}.photo-picker>img{width:48px;height:48px;object-fit:contain;border-radius:12px;background:#ffffff55;border:1px solid #ffffffaa}.photo-picker>div{flex:1;min-width:0}.photo-picker button{min-height:40px;font-size:13px;color:var(--accent);padding:0 5px}.photo-picker .muted{display:block;font-size:11px}.photo-picker #clearCategoryPhoto{color:var(--muted);font-size:12px}
+.icon-actions{display:flex;align-items:center;gap:2px;flex-shrink:0}.icon-actions button{font-size:12px;min-height:40px;padding:0 5px;color:var(--accent)}.icon-actions .reset-icon{color:var(--muted)}.category-actions{flex-wrap:wrap}.category-item .delete-category{padding:0 5px}.category-item>span{min-width:0;overflow-wrap:anywhere}

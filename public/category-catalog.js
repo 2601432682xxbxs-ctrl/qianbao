@@ -10,20 +10,21 @@ globalThis.CategoryCatalog=(()=>{
   '居住水电':'housing-utilities','医疗健康':'healthcare','医疗':'healthcare','运动健身':'fitness','健身':'fitness','学习教育':'education','学习':'education','教育':'education','书籍':'education',
   '公交':'bus','地铁':'metro','高铁':'high-speed-rail','火车':'high-speed-rail','飞机':'airplane','打车':'car','用车':'car','旅行住宿':'travel-hotel','住宿':'travel-hotel','会员订阅':'subscription','话费网费':'telecom','宠物':'pet','个护':'personal-care','礼物人情':'gifts','家居维修':'home-repair','工资':'salary','兼职':'salary','退款':'refund','储蓄':'savings','转账':'transfer'
  };
- Object.assign(names,{'生活费':'living-allowance','其他收入':'other-income','奖学金':'scholarship','娱乐':'daily-entertainment','日常生活':'daily-supplies','个人护肤品':'personal-care','礼物':'gifts'});
+ Object.assign(names,{'水费':'housing-utilities','生活费':'living-allowance','其他收入':'other-income','奖学金':'scholarship','娱乐':'daily-entertainment','日常生活':'daily-supplies','个人护肤品':'personal-care','礼物':'gifts'});
  const labels={'吃饭':'主食','奶茶饮品':'饮品'};
  const requestedPresets={'娱乐':['日常娱乐','娱乐场馆'],'医疗健康':[],'运动健身':[],'学习教育':[],'旅行住宿':[],'日常生活':['会员订阅','话费网费','个人护肤品','礼物']};
  // Apply once per ledger so a user's later deletions stay deleted.
  function addRequestedPresets(ledger){
-  if(ledger.categoryPresetsVersion>=1)return ledger;
+  if(ledger.categoryPresetsVersion>=2)return ledger;
   const categories=structuredClone(ledger.categories);
   const has=name=>Object.entries(categories).some(([key,subs])=>key===name||subs.includes(name));
-  for(const [parent,children] of Object.entries(requestedPresets)){
+  if(!(ledger.categoryPresetsVersion>=1))for(const [parent,children] of Object.entries(requestedPresets)){
    if(!children.length){if(!has(parent))categories[parent]=[];continue}
    const missing=children.filter(name=>!has(name));
    if(missing.length){if(!Object.hasOwn(categories,parent))categories[parent]=[];categories[parent].push(...missing)}
   }
-  return {...ledger,categories,categoryPresetsVersion:1};
+  if(!Object.hasOwn(categories,'日常生活'))categories['日常生活']=[];if(!categories['日常生活'].includes('水费'))categories['日常生活'].push('水费');
+  return {...ledger,categories,categoryPresetsVersion:2};
  }
  const income={'生活费':[],'兼职':[],'奖学金':[],'其他收入':[],'工资':[],'退款':[]};
  const groups=[{id:'public',label:'公共交通',icon:'public-transport',children:['公交','地铁'],legacy:['公交地铁','公共交通']},{id:'intercity',label:'城际出行',icon:'intercity-travel',children:['高铁','飞机'],legacy:['火车高铁','城际出行']}];
