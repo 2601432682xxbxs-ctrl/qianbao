@@ -1,0 +1,889 @@
+{
+  "canvas": 256,
+  "contentMax": 216,
+  "icons": [
+    {
+      "file": "meal-staple.png",
+      "label": "主食",
+      "sheet": "food-shopping",
+      "row": 1,
+      "column": 1,
+      "source_box": [
+        0,
+        0,
+        320,
+        332
+      ],
+      "alpha_bbox": [
+        33,
+        49,
+        299,
+        320
+      ],
+      "output_bbox": [
+        22,
+        20,
+        234,
+        236
+      ],
+      "transparent": true
+    },
+    {
+      "file": "snacks.png",
+      "label": "小吃",
+      "sheet": "food-shopping",
+      "row": 1,
+      "column": 2,
+      "source_box": [
+        320,
+        0,
+        632,
+        332
+      ],
+      "alpha_bbox": [
+        21,
+        25,
+        307,
+        307
+      ],
+      "output_bbox": [
+        20,
+        21,
+        236,
+        234
+      ],
+      "transparent": true
+    },
+    {
+      "file": "drinks.png",
+      "label": "饮品",
+      "sheet": "food-shopping",
+      "row": 1,
+      "column": 3,
+      "source_box": [
+        632,
+        0,
+        899,
+        332
+      ],
+      "alpha_bbox": [
+        10,
+        38,
+        244,
+        322
+      ],
+      "output_bbox": [
+        39,
+        20,
+        217,
+        236
+      ],
+      "transparent": true
+    },
+    {
+      "file": "group-dining.png",
+      "label": "聚餐",
+      "sheet": "food-shopping",
+      "row": 1,
+      "column": 4,
+      "source_box": [
+        899,
+        0,
+        1254,
+        332
+      ],
+      "alpha_bbox": [
+        22,
+        58,
+        342,
+        321
+      ],
+      "output_bbox": [
+        20,
+        39,
+        236,
+        217
+      ],
+      "transparent": true
+    },
+    {
+      "file": "shopping-clothing.png",
+      "label": "网购衣物",
+      "sheet": "food-shopping",
+      "row": 2,
+      "column": 1,
+      "source_box": [
+        0,
+        332,
+        321,
+        659
+      ],
+      "alpha_bbox": [
+        0,
+        16,
+        306,
+        310
+      ],
+      "output_bbox": [
+        20,
+        24,
+        236,
+        232
+      ],
+      "transparent": true
+    },
+    {
+      "file": "shopping-food.png",
+      "label": "网购食品",
+      "sheet": "food-shopping",
+      "row": 2,
+      "column": 2,
+      "source_box": [
+        321,
+        332,
+        624,
+        659
+      ],
+      "alpha_bbox": [
+        16,
+        18,
+        276,
+        305
+      ],
+      "output_bbox": [
+        30,
+        20,
+        226,
+        236
+      ],
+      "transparent": true
+    },
+    {
+      "file": "shopping-electronics.png",
+      "label": "网购电子",
+      "sheet": "food-shopping",
+      "row": 2,
+      "column": 3,
+      "source_box": [
+        624,
+        332,
+        930,
+        659
+      ],
+      "alpha_bbox": [
+        29,
+        32,
+        294,
+        309
+      ],
+      "output_bbox": [
+        24,
+        20,
+        231,
+        236
+      ],
+      "transparent": true
+    },
+    {
+      "file": "daily-supplies.png",
+      "label": "日用品",
+      "sheet": "food-shopping",
+      "row": 2,
+      "column": 4,
+      "source_box": [
+        930,
+        332,
+        1254,
+        659
+      ],
+      "alpha_bbox": [
+        15,
+        32,
+        305,
+        299
+      ],
+      "output_bbox": [
+        20,
+        28,
+        236,
+        227
+      ],
+      "transparent": true
+    },
+    {
+      "file": "public-transport.png",
+      "label": "公共交通",
+      "sheet": "food-shopping",
+      "row": 3,
+      "column": 1,
+      "source_box": [
+        0,
+        659,
+        312,
+        951
+      ],
+      "alpha_bbox": [
+        0,
+        42,
+        308,
+        257
+      ],
+      "output_bbox": [
+        20,
+        52,
+        236,
+        203
+      ],
+      "transparent": true
+    },
+    {
+      "file": "intercity-travel.png",
+      "label": "城际出行",
+      "sheet": "food-shopping",
+      "row": 3,
+      "column": 2,
+      "source_box": [
+        312,
+        659,
+        622,
+        951
+      ],
+      "alpha_bbox": [
+        7,
+        5,
+        302,
+        272
+      ],
+      "output_bbox": [
+        20,
+        30,
+        236,
+        225
+      ],
+      "transparent": true
+    },
+    {
+      "file": "daily-entertainment.png",
+      "label": "日常娱乐",
+      "sheet": "food-shopping",
+      "row": 3,
+      "column": 3,
+      "source_box": [
+        622,
+        659,
+        938,
+        951
+      ],
+      "alpha_bbox": [
+        8,
+        48,
+        316,
+        257
+      ],
+      "output_bbox": [
+        20,
+        54,
+        236,
+        201
+      ],
+      "transparent": true
+    },
+    {
+      "file": "entertainment-venue.png",
+      "label": "娱乐场馆",
+      "sheet": "food-shopping",
+      "row": 3,
+      "column": 4,
+      "source_box": [
+        938,
+        659,
+        1254,
+        951
+      ],
+      "alpha_bbox": [
+        0,
+        21,
+        303,
+        255
+      ],
+      "output_bbox": [
+        20,
+        44,
+        236,
+        211
+      ],
+      "transparent": true
+    },
+    {
+      "file": "housing-utilities.png",
+      "label": "居住水电",
+      "sheet": "food-shopping",
+      "row": 4,
+      "column": 1,
+      "source_box": [
+        0,
+        951,
+        319,
+        1254
+      ],
+      "alpha_bbox": [
+        0,
+        20,
+        301,
+        273
+      ],
+      "output_bbox": [
+        20,
+        37,
+        236,
+        219
+      ],
+      "transparent": true
+    },
+    {
+      "file": "healthcare.png",
+      "label": "医疗健康",
+      "sheet": "food-shopping",
+      "row": 4,
+      "column": 2,
+      "source_box": [
+        319,
+        951,
+        609,
+        1254
+      ],
+      "alpha_bbox": [
+        21,
+        30,
+        277,
+        271
+      ],
+      "output_bbox": [
+        20,
+        26,
+        236,
+        229
+      ],
+      "transparent": true
+    },
+    {
+      "file": "fitness.png",
+      "label": "运动健身",
+      "sheet": "food-shopping",
+      "row": 4,
+      "column": 3,
+      "source_box": [
+        609,
+        951,
+        931,
+        1254
+      ],
+      "alpha_bbox": [
+        16,
+        39,
+        320,
+        275
+      ],
+      "output_bbox": [
+        20,
+        44,
+        236,
+        212
+      ],
+      "transparent": true
+    },
+    {
+      "file": "education.png",
+      "label": "学习教育",
+      "sheet": "food-shopping",
+      "row": 4,
+      "column": 4,
+      "source_box": [
+        931,
+        951,
+        1254,
+        1254
+      ],
+      "alpha_bbox": [
+        4,
+        24,
+        300,
+        271
+      ],
+      "output_bbox": [
+        20,
+        38,
+        236,
+        218
+      ],
+      "transparent": true
+    },
+    {
+      "file": "bus.png",
+      "label": "公交",
+      "sheet": "transport-finance",
+      "row": 1,
+      "column": 1,
+      "source_box": [
+        0,
+        0,
+        319,
+        330
+      ],
+      "alpha_bbox": [
+        11,
+        86,
+        309,
+        287
+      ],
+      "output_bbox": [
+        20,
+        55,
+        236,
+        201
+      ],
+      "transparent": true
+    },
+    {
+      "file": "metro.png",
+      "label": "地铁",
+      "sheet": "transport-finance",
+      "row": 1,
+      "column": 2,
+      "source_box": [
+        319,
+        0,
+        617,
+        330
+      ],
+      "alpha_bbox": [
+        14,
+        19,
+        284,
+        300
+      ],
+      "output_bbox": [
+        24,
+        20,
+        232,
+        236
+      ],
+      "transparent": true
+    },
+    {
+      "file": "high-speed-rail.png",
+      "label": "高铁",
+      "sheet": "transport-finance",
+      "row": 1,
+      "column": 3,
+      "source_box": [
+        617,
+        0,
+        937,
+        330
+      ],
+      "alpha_bbox": [
+        15,
+        19,
+        320,
+        289
+      ],
+      "output_bbox": [
+        20,
+        33,
+        236,
+        223
+      ],
+      "transparent": true
+    },
+    {
+      "file": "airplane.png",
+      "label": "飞机",
+      "sheet": "transport-finance",
+      "row": 1,
+      "column": 4,
+      "source_box": [
+        937,
+        0,
+        1254,
+        330
+      ],
+      "alpha_bbox": [
+        14,
+        93,
+        305,
+        289
+      ],
+      "output_bbox": [
+        20,
+        55,
+        236,
+        200
+      ],
+      "transparent": true
+    },
+    {
+      "file": "car.png",
+      "label": "用车",
+      "sheet": "transport-finance",
+      "row": 2,
+      "column": 1,
+      "source_box": [
+        0,
+        330,
+        320,
+        628
+      ],
+      "alpha_bbox": [
+        14,
+        33,
+        310,
+        269
+      ],
+      "output_bbox": [
+        20,
+        42,
+        236,
+        214
+      ],
+      "transparent": true
+    },
+    {
+      "file": "travel-hotel.png",
+      "label": "旅行住宿",
+      "sheet": "transport-finance",
+      "row": 2,
+      "column": 2,
+      "source_box": [
+        320,
+        330,
+        620,
+        628
+      ],
+      "alpha_bbox": [
+        10,
+        32,
+        290,
+        279
+      ],
+      "output_bbox": [
+        20,
+        32,
+        236,
+        223
+      ],
+      "transparent": true
+    },
+    {
+      "file": "subscription.png",
+      "label": "会员订阅",
+      "sheet": "transport-finance",
+      "row": 2,
+      "column": 3,
+      "source_box": [
+        620,
+        330,
+        937,
+        628
+      ],
+      "alpha_bbox": [
+        10,
+        55,
+        307,
+        283
+      ],
+      "output_bbox": [
+        20,
+        45,
+        236,
+        211
+      ],
+      "transparent": true
+    },
+    {
+      "file": "telecom.png",
+      "label": "话费网费",
+      "sheet": "transport-finance",
+      "row": 2,
+      "column": 4,
+      "source_box": [
+        937,
+        330,
+        1254,
+        628
+      ],
+      "alpha_bbox": [
+        9,
+        45,
+        301,
+        269
+      ],
+      "output_bbox": [
+        20,
+        45,
+        236,
+        211
+      ],
+      "transparent": true
+    },
+    {
+      "file": "pet.png",
+      "label": "宠物",
+      "sheet": "transport-finance",
+      "row": 3,
+      "column": 1,
+      "source_box": [
+        0,
+        628,
+        314,
+        931
+      ],
+      "alpha_bbox": [
+        21,
+        74,
+        290,
+        274
+      ],
+      "output_bbox": [
+        20,
+        47,
+        236,
+        208
+      ],
+      "transparent": true
+    },
+    {
+      "file": "personal-care.png",
+      "label": "个护",
+      "sheet": "transport-finance",
+      "row": 3,
+      "column": 2,
+      "source_box": [
+        314,
+        628,
+        614,
+        931
+      ],
+      "alpha_bbox": [
+        25,
+        23,
+        281,
+        297
+      ],
+      "output_bbox": [
+        27,
+        20,
+        229,
+        236
+      ],
+      "transparent": true
+    },
+    {
+      "file": "gifts.png",
+      "label": "礼物人情",
+      "sheet": "transport-finance",
+      "row": 3,
+      "column": 3,
+      "source_box": [
+        614,
+        628,
+        947,
+        931
+      ],
+      "alpha_bbox": [
+        20,
+        45,
+        319,
+        292
+      ],
+      "output_bbox": [
+        20,
+        39,
+        236,
+        217
+      ],
+      "transparent": true
+    },
+    {
+      "file": "home-repair.png",
+      "label": "家居维修",
+      "sheet": "transport-finance",
+      "row": 3,
+      "column": 4,
+      "source_box": [
+        947,
+        628,
+        1254,
+        931
+      ],
+      "alpha_bbox": [
+        19,
+        8,
+        270,
+        284
+      ],
+      "output_bbox": [
+        30,
+        20,
+        226,
+        236
+      ],
+      "transparent": true
+    },
+    {
+      "file": "salary.png",
+      "label": "工资",
+      "sheet": "transport-finance",
+      "row": 4,
+      "column": 1,
+      "source_box": [
+        0,
+        931,
+        314,
+        1254
+      ],
+      "alpha_bbox": [
+        0,
+        30,
+        314,
+        281
+      ],
+      "output_bbox": [
+        20,
+        41,
+        236,
+        214
+      ],
+      "transparent": true
+    },
+    {
+      "file": "refund.png",
+      "label": "退款",
+      "sheet": "transport-finance",
+      "row": 4,
+      "column": 2,
+      "source_box": [
+        314,
+        931,
+        615,
+        1254
+      ],
+      "alpha_bbox": [
+        12,
+        25,
+        282,
+        291
+      ],
+      "output_bbox": [
+        20,
+        21,
+        236,
+        234
+      ],
+      "transparent": true
+    },
+    {
+      "file": "savings.png",
+      "label": "储蓄",
+      "sheet": "transport-finance",
+      "row": 4,
+      "column": 3,
+      "source_box": [
+        615,
+        931,
+        937,
+        1254
+      ],
+      "alpha_bbox": [
+        17,
+        21,
+        303,
+        289
+      ],
+      "output_bbox": [
+        20,
+        27,
+        236,
+        229
+      ],
+      "transparent": true
+    },
+    {
+      "file": "transfer.png",
+      "label": "转账",
+      "sheet": "transport-finance",
+      "row": 4,
+      "column": 4,
+      "source_box": [
+        937,
+        931,
+        1254,
+        1254
+      ],
+      "alpha_bbox": [
+        20,
+        34,
+        279,
+        291
+      ],
+      "output_bbox": [
+        20,
+        21,
+        236,
+        235
+      ],
+      "transparent": true
+    }
+  ],
+  "generic": "generic.png",
+  "incomeIcons": [
+    {
+      "file": "living-allowance.png",
+      "label": "生活费",
+      "source_box": [
+        0,
+        0,
+        724,
+        724
+      ],
+      "output_bbox": [
+        46,
+        25,
+        236,
+        219
+      ]
+    },
+    {
+      "file": "other-income.png",
+      "label": "其他收入",
+      "source_box": [
+        724,
+        0,
+        1448,
+        724
+      ],
+      "output_bbox": [
+        33,
+        35,
+        221,
+        211
+      ]
+    },
+    {
+      "file": "scholarship.png",
+      "label": "奖学金",
+      "source_box": [
+        1448,
+        0,
+        2172,
+        724
+      ],
+      "output_bbox": [
+        25,
+        42,
+        226,
+        231
+      ]
+    }
+  ]
+}
