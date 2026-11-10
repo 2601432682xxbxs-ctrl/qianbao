@@ -12,10 +12,11 @@ function currentMonth(){return localDate(new Date()).slice(0,7)}
 function normalizeBudgets(value){
  const valid=n=>Number.isSafeInteger(n)&&n>0;
  const categories=Object.fromEntries(Object.entries(value?.categories||{}).filter(([key,n])=>key.trim()&&valid(n)));
- return {total:valid(value?.total)?value.total:null,categories};
+ const raw=value?.threshold,threshold=raw===undefined||raw===null||raw===''||!Number.isFinite(Number(raw))?80:Number(raw);
+ return {total:valid(value?.total)?value.total:null,categories,threshold:Math.max(50,Math.min(100,Math.round(threshold)))};
 }
 function budgetExpense(rows){return rows.filter(e=>CategoryCatalog.accountingType(e)==='expense'&&CategoryCatalog.kind(e)!=='refund').reduce((sum,e)=>sum+e.cents,0)}
-function budgetStatus(spent,limit){return spent>limit?'over':spent>=limit*.8?'warning':'normal'}
+function budgetStatus(spent,limit){return spent>limit?'over':spent>=limit*normalizeBudgets(state.budgets).threshold/100?'warning':'normal'}
 function budgetMeter(spent,limit){
  const meter=node('div','budget-meter');meter.setAttribute('role','progressbar');meter.setAttribute('aria-label','预算使用进度');meter.setAttribute('aria-valuemin','0');meter.setAttribute('aria-valuemax',String(limit));meter.setAttribute('aria-valuenow',String(Math.min(spent,limit)));meter.setAttribute('aria-valuetext',`已花 ${money(spent)} 元，预算 ${money(limit)} 元`);
  const fill=node('i');fill.style.width=Math.min(100,spent/limit*100)+'%';meter.append(fill);return meter;
@@ -24,7 +25,7 @@ function renderBudgetProgress(){
  const box=$('#budgetProgress'),budgets=normalizeBudgets(state.budgets),rows=state.entries.filter(e=>e.date.startsWith(currentMonth())),spent=budgetExpense(rows);box.replaceChildren();box.className='budget-progress';
  if(budgets.total){box.classList.add(budgetStatus(spent,budgets.total));box.append(node('div','',`本月已花 ${money(spent)} / ${money(budgets.total)}`),node('div','',spent>budgets.total?`超预算 ${money(spent-budgets.total)}`:`剩余 ${money(budgets.total-spent)}`),budgetMeter(spent,budgets.total))}
  else box.append(node('span','','本月预算未设置 · 可在设置中添加'));
- const alerts=Object.entries(budgets.categories).filter(([c,limit])=>budgetExpense(rows.filter(e=>e.category===c))>=limit*.8);
+ const alerts=Object.entries(budgets.categories).filter(([c,limit])=>budgetExpense(rows.filter(e=>e.category===c))>=limit*budgets.threshold/100);
  if(alerts.length){const alert=node('span','budget-category-alert',`分类预算提醒 ${alerts.length} 项 ›`);alert.onclick=()=>$('#openBudgets').click();alert.tabIndex=0;alert.setAttribute('role','button');alert.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();alert.click()}};box.append(alert)}
 }
 function budgetTargets(){const budgets=normalizeBudgets(state.budgets);return [...new Set([...Object.keys(state.categories),...Object.keys(budgets.categories)])].filter(c=>!['transfer','savings','refund'].includes(CategoryCatalog.kind({category:c,type:'expense'})))}
