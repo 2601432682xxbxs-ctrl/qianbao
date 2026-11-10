@@ -15,9 +15,12 @@ function templateDue(t,date=new Date()){
  return date.getDate()===Math.min(t.day,new Date(date.getFullYear(),date.getMonth()+1,0).getDate());
 }
 function templateRecorded(t){return state.entries.some(e=>e.templateId===t.id&&e.templateDueDate===localDate(new Date()))}
+function tomorrowDate(date=new Date()){const next=new Date(date);next.setDate(next.getDate()+1);return next}
+function renderAdvanceReminder(){const rows=templates().filter(t=>templateDue(t,tomorrowDate())&&!templateRecorded(t));$('#recurringTomorrow').hidden=!rows.length;$('#recurringTomorrow').textContent=`明天有固定支出待记（${rows.length} 笔）`}
 function renderSafety(){
  const due=templates().filter(t=>templateDue(t)&&!templateRecorded(t));
  $('#recurringNotice').textContent=due.length?`今天有固定支出待记（${due.length} 笔），点下方管理模板记账`:'今天没有固定支出待记';
+ renderAdvanceReminder();
  $('#backupReminder').hidden=!!state.lastBackupAt&&Date.now()-state.lastBackupAt<=7*86400000;
  $('#pinStatus').textContent=state.lock?.enabled?'开屏锁已开启：打开应用或从后台切回时输入 PIN。':'开屏锁已关闭（默认）。';
  $('#disablePin').hidden=!state.lock?.enabled;
@@ -38,7 +41,7 @@ function editTemplate(t){
 function renderTemplates(){
  $('#recurringRows').replaceChildren();
  for(const t of templates()){
- const due=templateDue(t),done=templateRecorded(t),r=node('div','template-row');r.append(node('b','',t.name),node('small','',`¥ ${(t.cents/100).toFixed(2)} · ${CategoryCatalog.label(t.category)}${t.sub?' / '+t.sub:''} · ${t.cycle==='monthly'?'每月 '+t.day+' 日':'每周'+['日','一','二','三','四','五','六'][t.day]}${due?(done?' · 今天已记':' · 今天待记'):''}`));
+ const due=templateDue(t),done=templateRecorded(t),r=node('div','template-row');r.append(node('b','',t.name),node('small','',`¥ ${(t.cents/100).toFixed(2)} · ${CategoryCatalog.label(t.category)}${t.sub?' / '+t.sub:''} · ${t.cycle==='monthly'?'每月 '+t.day+' 日':'每周'+['日','一','二','三','四','五','六'][t.day]}${due?(done?' · 今天已记':' · 今天待记'):''}${!done&&templateDue(t,tomorrowDate())?' · 明天待记':''}`));
  const actions=node('div','template-actions');
  if(due&&!done){const record=node('button','','记一笔');record.onclick=()=>{pendingTemplate=t;$('#recurringAmount').value=(t.cents/100).toFixed(2);$('#recurringNote').value=t.name;$('#recurringEntryInfo').textContent=`${localDate(new Date())} · ${CategoryCatalog.label(t.category)}${t.sub?' / '+t.sub:''}`;$('#recurringEntryDialog').showModal()};actions.append(record)}
  const edit=node('button','','编辑'),del=node('button','','删除');edit.onclick=()=>{editTemplate(t);$('#templateName').focus()};del.onclick=()=>{if(confirm('删除模板“'+t.name+'”？已有账单会保留。')&&persist({...state,templates:templates().filter(x=>x.id!==t.id)})){if(templateEditing===t.id)editTemplate();renderTemplates();renderSafety()}};actions.append(edit,del);r.append(actions);$('#recurringRows').append(r);
