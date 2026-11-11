@@ -34,15 +34,15 @@ $('#clearFilters').onclick=()=>applyFilter({});
 function renderSavedFilters(){const box=$('#savedFilterTags');box.replaceChildren();for(const f of state.savedFilters||[]){const tag=node('div','filter-tag'),apply=node('button','',f.name),del=node('button','','×');apply.onclick=()=>applyFilter(f.filters);del.setAttribute('aria-label','删除筛选'+f.name);del.onclick=()=>{if(persist({...state,savedFilters:state.savedFilters.filter(x=>x.id!==f.id)}))renderSavedFilters()};tag.append(apply,del);box.append(tag)}}
 $('#saveFilter').onclick=()=>{const name=$('#filterName').value.trim();if(!name||name.length>16)return toast('请输入最多 16 字的筛选名称');const rows=state.savedFilters||[],old=rows.find(f=>f.name===name);if(old&&!confirm('同名筛选已存在，是否覆盖？'))return;const f={id:old?.id||crypto.randomUUID(),name,filters:readFilter()};if(persist({...state,savedFilters:old?rows.map(x=>x.id===old.id?f:x):[...rows,f]})){renderSavedFilters();toast('常用筛选已保存')}};
 function monthlyNarrative(key){
- const rows=state.entries.filter(e=>e.date.startsWith(key));if(!rows.length)return '本月还没有账单';
- const t=totals(rows),[y,m]=key.split('-').map(Number),previous=localDate(new Date(y,m-2,1)).slice(0,7),last=totals(state.entries.filter(e=>e.date.startsWith(previous))).expense;
+ const rows=state.entries.filter(e=>inLedgerMonth(e,key));if(!rows.length)return '本月还没有账单';
+ const t=totals(rows),[y,m]=key.split('-').map(Number),previous=localDate(new Date(y,m-2,1)).slice(0,7),last=totals(state.entries.filter(e=>inLedgerMonth(e,previous))).expense;
  const categories=[...new Set([...Object.keys(state.categories),...rows.map(e=>e.category)])];let top='',largest=0;
  for(const c of categories){const n=totals(rows.filter(e=>e.category===c)).expense;if(n>largest){top=c;largest=n}}
  const diff=t.expense-last,comparison=last?`比上月${diff>=0?'多':'少'}支出 ¥ ${money(Math.abs(diff))}（${(Math.abs(diff)/last*100).toFixed(2)}%）`:'上月无支出';
  return `本月支出 ¥ ${money(t.expense)}，收入 ¥ ${money(t.income)}，结余 ¥ ${money(t.income-t.expense)}。${top?`支出最多的是${CategoryCatalog.label(top)}：¥ ${money(largest)}，占支出 ${(largest/t.expense*100).toFixed(2)}%。`:'本月无支出。'}${comparison}。`;
 }
 const summary28=renderSummary;renderSummary=function(){summary28();$('#monthlyNarrative').textContent=monthlyNarrative($('#month').value)};
-let calendarMonth=currentMonth(),annualYear=new Date().getFullYear();
+let calendarMonth=localDate(new Date()).slice(0,7),annualYear=new Date().getFullYear();
 function shiftMonth(key,offset){const [y,m]=key.split('-').map(Number);return localDate(new Date(y,m-1+offset,1)).slice(0,7)}
 function calendarMoney(cents){return cents>=1000000?(cents/1000000).toFixed(1)+'万':(cents/100).toFixed(2)}
 function renderCalendar(){
@@ -56,8 +56,8 @@ $('#calendarPrev').onclick=()=>{calendarMonth=shiftMonth(calendarMonth,-1);rende
 // Close underlying analysis dialogs when editing, exposing the existing home editor.
 const beginEdit28=beginEdit;beginEdit=function(id){for(const dialog of document.querySelectorAll('dialog[open]'))dialog.close();beginEdit28(id)};
 function renderAnnual(){
- $('#annualLabel').textContent=annualYear+' 年';const data=Array.from({length:12},(_,i)=>{const key=annualYear+'-'+String(i+1).padStart(2,'0');return {key,...totals(state.entries.filter(e=>e.date.startsWith(key)))}}),max=Math.max(1,...data.flatMap(d=>[d.income,d.expense])),chart=$('#annualChart');chart.replaceChildren();
- for(const [i,d] of data.entries()){const group=node('div','month-column'),bars=node('div','month-bars');for(const kind of ['income','expense']){const bar=node('div','month-bar '+kind);bar.style.height=d[kind]/max*100+'%';bars.append(bar)}const detail=node('details','chart-detail');detail.append(node('summary','',i+1+'月'),node('span','',`收入 ${money(d.income)}；支出 ${money(d.expense)}`));group.append(bars,detail);chart.append(group)}
+ $('#annualLabel').textContent=annualYear+' 年';const data=Array.from({length:12},(_,i)=>{const key=annualYear+'-'+String(i+1).padStart(2,'0');return {key,...totals(state.entries.filter(e=>inLedgerMonth(e,key)))}}),max=Math.max(1,...data.flatMap(d=>[d.income,d.expense])),chart=$('#annualChart');chart.replaceChildren();
+ for(const [i,d] of data.entries()){const group=node('div','month-column'),bars=node('div','month-bars');for(const kind of ['income','expense']){const bar=node('div','month-bar '+kind);bar.style.height=d[kind]/max*100+'%';bars.append(bar)}const detail=node('details','chart-detail');detail.append(node('summary','',i+1+'月账月'),node('span','',ledgerRangeShort(d.key)+'；收入 '+money(d.income)+'；支出 '+money(d.expense)));group.append(bars,detail);chart.append(group)}
  const income=data.reduce((a,d)=>a+d.income,0),expense=data.reduce((a,d)=>a+d.expense,0);$('#annualTotals').textContent=`年总收入 ¥ ${money(income)} · 年总支出 ¥ ${money(expense)} · 年结余 ¥ ${money(income-expense)} · 月均支出 ¥ ${money(expense/12)} · 月均收入 ¥ ${money(income/12)}`;
 }
 $('#openAnnual').onclick=()=>{annualYear=new Date().getFullYear();renderAnnual();$('#annualDialog').showModal()};$('#annualPrev').onclick=()=>{annualYear--;renderAnnual()};$('#annualNext').onclick=()=>{annualYear++;renderAnnual()};
@@ -77,5 +77,5 @@ function renderLoans(){const box=$('#loanRows');box.replaceChildren();const pend
 $('#openLoans').onclick=()=>{editLoan();renderLoans();$('#loansDialog').showModal()};$('#newLoan').onclick=()=>editLoan();
 $('#loanForm').onsubmit=e=>{e.preventDefault();const name=$('#loanName').value.trim(),cents=Math.round(Number($('#loanAmount').value)*100),date=$('#loanDate').value,status=$('#loanStatus').value,repaidDate=status==='paid'?($('#loanRepaidDate').value||localDate(new Date())):'';if(!name||name.length>16||!positiveCents(cents)||!validDate(date)||(repaidDate&&!validDate(repaidDate)))return toast('请检查姓名、金额和日期');const l={id:loanEditing||crypto.randomUUID(),name,cents,date,direction:$('#loanDirection').value,note:$('#loanNote').value.trim(),status,repaidDate};if(persist({...state,loans:loanEditing?loans().map(x=>x.id===loanEditing?l:x):[...loans(),l]})){editLoan();renderLoans();toast('往来已保存')}};
 // Keep secondary views fresh after edits, restores, and each minute's local-date check.
-const render28=render;render=function(){render28();renderEvening();renderSavedFilters();if($('#calendarDialog').open)renderCalendar();if($('#annualDialog').open)renderAnnual();if($('#goalsDialog').open)renderGoals();if($('#loansDialog').open)renderLoans()};
+const render28=render;render=function(){render28();if($('#statsDialog').open)renderStats();renderEvening();renderSavedFilters();if($('#calendarDialog').open)renderCalendar();if($('#annualDialog').open)renderAnnual();if($('#goalsDialog').open)renderGoals();if($('#loansDialog').open)renderLoans()};
 setInterval(()=>render(),60000);render();renderSafety();

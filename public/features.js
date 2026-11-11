@@ -58,7 +58,7 @@ function csvText(rows){
  return '\uFEFF'+[['日期','类型','大分类','细分类','金额','备注'],...rows.map(e=>[e.date,e.type==='income'?'收入':'支出',CategoryCatalog.label(e.category),e.sub,(e.cents/100).toFixed(2),e.note])].map(r=>r.map(cell).join(',')).join('\r\n')+'\r\n';
 }
 $('#openCsv').onclick=()=>$('#csvDialog').showModal();
-$('#exportCsv').onclick=()=>{const scope=$('#csvScope').value,rows=scope==='filtered'?filteredRecords():scope==='month'?state.entries.filter(e=>e.date.startsWith(currentMonth())):state.entries;downloadFile(new Blob([csvText(rows)],{type:'text/csv;charset=utf-8'}),`lanyu-ledger-${localDate(new Date())}.csv`);toast(`已导出 ${rows.length} 条记录`)};
+$('#exportCsv').onclick=()=>{const scope=$('#csvScope').value,rows=scope==='filtered'?filteredRecords():scope==='month'?state.entries.filter(e=>inLedgerMonth(e,currentMonth())):state.entries;downloadFile(new Blob([csvText(rows)],{type:'text/csv;charset=utf-8'}),`lanyu-ledger-${localDate(new Date())}.csv`);toast(`已导出 ${rows.length} 条记录`)};
 $('#backupReminder').onclick=()=>downloadBackup();
 const originalOpenSettings=$('#openSettings').onclick;
 $('#openSettings').onclick=()=>{renderSafety();originalOpenSettings()};

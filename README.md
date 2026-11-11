@@ -2,7 +2,9 @@
 
 面向大学生日常使用的本地记账 PWA，适配 iPhone，支持离线记账。
 
-## 3.3 融合版 · 离线缓存 v25
+## 3.4 自定义账月 · 离线缓存 v26
+
+3.4 新增设置 → 预算与固定支出 → 每月起始日，复用日历弹窗，选择 1–28 日后确认。首页、月总结、预算、年度总览与 CSV 本月范围统一按账月计算；默认 5 号（账月为每月 5 日–下月 4 日）。`monthStartDay` 随 version 1 JSON 备份，旧备份恢复默认 5，不修改账单。离线缓存同步为 v26，仍为 50 个文件。
 
 3.3 合并 GitHub 新版的日历、年度总览、目标、往来、常用筛选和提醒，以及本地 3.2 的分组设置、预算快捷按钮、固定弹窗、日期确认选择与离线更新修复。真实离线进度包含50个文件。
 
@@ -88,3 +90,9 @@ node tests/integration3.cjs
 现有本地静态测试服务器上可运行：`node tests/batch2.cjs`、`node tests/batch3.cjs`、`node tests/integration3.cjs`、`node tests/ui33.cjs`。沿用上文Playwright环境变量。最后一个脚本新增分组折叠、日期确认、常用筛选标签同步、18个窗口固定尺寸与三种手机视口检查。
 
 iPhone Safari真机与照片选择仍需手机复测；自动测试使用独立模拟数据。
+
+## 3.4 验收
+
+新增 `tests/batch5.cjs` 覆盖日历选择与确认、29–31 日拒绝保存、10 号账月统计与跨年边界、1 号自然月兼容、28 号和闰月、JSON 往返和旧备份、账单不变、三种视口和 v26 离线重载。回归继续使用 `tests/batch2.cjs`、`tests/batch3.cjs`、`tests/integration3.cjs`、`tests/ui33.cjs`。
+
+测试需启动 public/ 本地静态服务（127.0.0.1:8765），并安装 Playwright/Chromium；可用 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`CHROMIUM_ARGS` 配置环境。

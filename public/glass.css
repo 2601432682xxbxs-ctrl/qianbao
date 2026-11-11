@@ -118,3 +118,10 @@ dialog>.dialoghead{flex-shrink:0}dialog>.modal-scroll{flex:1;min-height:0;overfl
 .balance-value #eveningNotice{flex:0 1 132px;min-width:0;width:auto;height:30px;margin-left:auto;gap:2px;border-radius:12px}.balance-value #eveningAction{font-size:11px;min-height:28px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.balance-value #eveningDismiss{min-width:25px;min-height:28px;padding:0}.balance-value strong{flex:0 1 auto;min-width:0}
 
 #eveningDismiss{display:grid;place-items:center}#eveningDismiss svg{width:16px;height:16px}
+
+/* Ledger ranges wrap within the month switcher, including on 320px screens. */
+#openMonthPicker{min-width:0;gap:4px;font-size:13px;line-height:1.5;padding:4px 0}#monthLabel{overflow-wrap:anywhere}.monthbar>button:first-child,.monthbar>button:last-child{flex-shrink:0}
+.monthline{gap:8px;justify-content:space-between}.monthline>span{min-width:0;overflow-wrap:anywhere}.monthline{font-size:10px}.monthline b{margin-left:2px}
+#chooseMonthStart{margin-top:0}
+@media(min-height:601px) and (max-height:720px){.app{gap:3px}}
+@media(max-height:600px){.app{gap:1px}}
