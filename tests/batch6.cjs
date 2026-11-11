@@ -1,3 +1,4 @@
+const {chooseField}=require('./ui-helpers.cjs');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 (async()=>{
@@ -25,12 +26,12 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
   });
   await page.clock.install({time:new Date('2026-11-11T12:00:00+08:00')});await page.goto(url);await page.waitForFunction(()=>$('#offlineStatus').dataset.ready==='true');
   report.cache=await page.evaluate(async()=>{const status=await offlineProbe(),cache=await caches.open(status.version);return {...status,zipCached:!!await cache.match('./assets/budget-emojis/emoji-pack.zip'),emojiFiles:(await cache.keys()).filter(r=>r.url.includes('/budget-emojis/')).length}});
-  assert.equal(report.cache.version,'lanyu-shell-v27');assert.equal(report.cache.total,58);assert.equal(report.cache.ready,true);assert.equal(report.cache.emojiFiles,8);assert.equal(report.cache.zipCached,false);assert.equal(await page.locator('#offlineProgress').getAttribute('max'),'58');
+  assert.equal(report.cache.version,'lanyu-shell-v33');assert.equal(report.cache.total,59);assert.equal(report.cache.ready,true);assert.equal(report.cache.emojiFiles,4);assert.equal(report.cache.zipCached,false);assert.equal(await page.locator('#offlineProgress').getAttribute('max'),'59');
   await page.unroute(url+'**');await context.setOffline(true);await page.reload();await page.waitForFunction(()=>$('#offlineStatus').dataset.ready==='true');report.offline=true;
   await resetSettings();report.budgetBoundaries=[];
   for(const [remaining,expected]of [[100,'happy'],[50,'happy'],[49.99,'nervous'],[20,'nervous'],[19.99,'anxious'],[5,'anxious'],[4.99,'crying'],[0,'crying'],[-10,'crying']]){await setRemaining(remaining);assert.equal(await readEmoji(),expected,'budget remaining '+remaining);report.budgetBoundaries.push({remaining,expected})}
   await setRemaining(50);await page.locator('[data-key="1"]').click();await page.locator('#saveEntry').click();assert.equal(await readEmoji(),'nervous');await page.locator('#openRecords').click();await page.locator('#records .row .delete-record').first().click();assert.equal(await readEmoji(),'happy');await page.locator('#recordsDialog [data-close]').click();
-  await page.locator('#openSettings').click();await page.locator('[data-setting=planning] summary').click();await page.locator('#openBudgets').click();await page.selectOption('#budgetTarget','');await page.locator('#budgetAmount').fill('60');await page.locator('#budgetForm [type=submit]').click();assert.equal(await readEmoji(),'anxious');await page.locator('#budgetDialog [data-close]').click();await page.locator('#settings [data-close]').click();report.liveUpdates={add:true,delete:true,budget:true};
+  await page.locator('#openSettings').click();await page.locator('[data-setting=planning] summary').click();await page.locator('#openBudgets').click();await chooseField(page,'budgetTarget','');await page.locator('#budgetAmount').fill('60');await page.locator('#budgetForm [type=submit]').click();assert.equal(await readEmoji(),'anxious');await page.locator('#budgetDialog [data-close]').click();await page.locator('#settings [data-close]').click();report.liveUpdates={add:true,delete:true,budget:true};
   report.absoluteBoundaries=[];
   for(const mode of ['budget','absolute']){
    await page.evaluate(mode=>{state.balanceEmoji={...structuredClone(BALANCE_EMOJI_DEFAULTS),mode}},mode);
@@ -49,10 +50,10 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
   assert.deepEqual(exported.balanceEmoji,{mode:'absolute',percent:[60,30,10],amountCents:[80000,40000,10000]});const originalEntries=structuredClone(exported.entries),legacy=structuredClone(exported);delete legacy.balanceEmoji;
   await restore(legacy);assert.deepEqual(await page.evaluate(()=>balanceEmojiSettings()),{mode:'budget',percent:[50,20,5],amountCents:[100000,50000,20000]});assert.deepEqual(await page.evaluate(()=>state.entries),originalEntries);
   await restore(exported);assert.deepEqual(await page.evaluate(()=>state.balanceEmoji),exported.balanceEmoji);assert.deepEqual(await page.evaluate(()=>state.entries),originalEntries);report.backup={jsonRoundTrip:true,legacyDefaults:true,entriesPreserved:true};
-  await page.locator('#settings [data-close]').click();await resetSettings();report.gifOfflineDecoded=[];
-  for(const balance of [2000,750,300,100]){await setAbsolute(balance);await page.waitForFunction(()=>$('#balanceEmoji').getAttribute('src').endsWith('.gif'));await page.locator('#balanceEmoji').evaluate(image=>image.decode());assert.equal(await page.locator('#balanceEmoji').evaluate(image=>image.naturalWidth),512);report.gifOfflineDecoded.push(await readEmoji())}
+  await page.locator('#settings [data-close]').click();await resetSettings();report.pngOfflineDecoded=[];
+  for(const balance of [2000,750,300,100]){await setAbsolute(balance);await page.waitForFunction(()=>$('#balanceEmoji').getAttribute('src').endsWith('.png'));await page.locator('#balanceEmoji').evaluate(image=>image.decode());assert.equal(await page.locator('#balanceEmoji').evaluate(image=>image.naturalWidth),512);report.pngOfflineDecoded.push(await readEmoji())}
   await setAbsolute(2000);assert.equal(await page.locator('#balanceEmoji').getAttribute('aria-label'),'余额状态：开心');
-  await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>$('#balanceEmoji').getAttribute('src').endsWith('.png'));await page.locator('#balanceEmoji').evaluate(image=>image.decode());await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>$('#balanceEmoji').getAttribute('src').endsWith('.gif'));report.reducedMotion=true;
+  await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>$('#balanceEmoji').getAttribute('src').endsWith('.png'));await page.locator('#balanceEmoji').evaluate(image=>image.decode());await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>$('#balanceEmoji').getAttribute('src').endsWith('.png'));report.reducedMotion=true;
   report.viewports=[];
   for(const [width,height]of [[320,568],[375,667],[390,844]]){
    await page.setViewportSize({width,height});for(const balance of [-1234.56,123456.78]){
@@ -61,9 +62,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
    }
   }
   if(process.env.ARTIFACT_DIR){await page.evaluate(()=>{$('#toast').hidden=true;document.activeElement?.blur()});await page.waitForTimeout(250);await page.screenshot({path:path.join(process.env.ARTIFACT_DIR,'余额表情3.5-首页.png')})}
-  // Corrupt only this throwaway profile's GIF cache, retaining the original PNG.
-  await setAbsolute(2000);await page.evaluate(async()=>{const cache=await caches.open('lanyu-shell-v27');await cache.put('./assets/budget-emojis/01-smile.gif',new Response('broken gif',{headers:{'Content-Type':'image/gif'}}))});
-  await cdp.send('Network.setCacheDisabled',{cacheDisabled:true});await cdp.send('Network.clearBrowserCache');await page.goto('about:blank');await page.goto(url);await page.waitForSelector('.cat');await page.waitForFunction(()=>$('#balanceEmoji').getAttribute('src').endsWith('01-smile.png'));await page.locator('#balanceEmoji').evaluate(image=>image.decode());assert.equal(await page.locator('#balanceEmoji').evaluate(image=>image.naturalWidth),512);report.brokenGifOfflinePngFallback=true;
+  report.staticAssetsOnly=await page.evaluate(async()=>{const c=await caches.open('lanyu-shell-v33');return !(await c.keys()).some(request=>request.url.endsWith('.gif'))});assert.equal(report.staticAssetsOnly,true);
   assert.deepEqual(errors,[]);report.errors=errors;if(process.env.REPORT_PATH)fs.writeFileSync(process.env.REPORT_PATH,JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
  }finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exit(1)});

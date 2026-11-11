@@ -885,5 +885,51 @@
         231
       ]
     }
+  ],
+  "fitnessIcons": [
+    {
+      "file": "gym-membership.png",
+      "label": "健身卡",
+      "source_box": [
+        0,
+        0,
+        1086,
+        724
+      ],
+      "visible_art_box": [
+        239,
+        176,
+        907,
+        628
+      ],
+      "output_bbox": [
+        20,
+        55,
+        236,
+        201
+      ]
+    },
+    {
+      "file": "fitness-supplements.png",
+      "label": "补剂",
+      "source_box": [
+        1086,
+        0,
+        2172,
+        724
+      ],
+      "visible_art_box": [
+        226,
+        88,
+        847,
+        651
+      ],
+      "output_bbox": [
+        20,
+        30,
+        236,
+        226
+      ]
+    }
   ]
 }

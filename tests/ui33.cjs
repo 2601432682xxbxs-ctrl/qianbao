@@ -1,3 +1,4 @@
+const {chooseField,setDateField}=require('./ui-helpers.cjs');
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs');
 (async()=>{
@@ -6,7 +7,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs');
  try{
   await page.clock.install({time:new Date(2026,10,15,21,5)});
   await page.goto(process.env.APP_TEST_URL||'http://127.0.0.1:8765/');await page.waitForFunction(()=>document.querySelector('#offlineStatus').dataset.ready==='true');
-  assert.equal(await page.evaluate(()=>(offlineProbe()).then(r=>r.total)),58);
+  assert.equal(await page.evaluate(()=>(offlineProbe()).then(r=>r.total)),59);
   await page.locator('#openSettings').click();assert.equal(await page.locator('#settings .settings-group').count(),7);assert.equal(await page.locator('#settings .settings-group[open]').count(),0);
   const before=await page.locator('#settings').boundingBox();await page.locator('#settings details').evaluateAll(rows=>rows.forEach(d=>d.open=true));const after=await page.locator('#settings').boundingBox();assert.equal(after.height,before.height);assert.equal(after.y,before.y);assert.ok(await page.locator('.settings-scroll').evaluate(e=>e.scrollHeight>e.clientHeight));await page.locator('#settings [data-close]').click();report.settings={groups:7,fixedOnExpansion:true};
   await page.locator('#quickBudget').click();assert.ok(await page.locator('#budgetDialog').isVisible());await page.locator('#budgetDialog [data-close]').click();

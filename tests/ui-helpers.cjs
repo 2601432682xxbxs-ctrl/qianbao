@@ -16,4 +16,21 @@ async function setRecordDate(page,field,value){
  }
  await page.locator('#confirmRecordDate').click();
 }
-module.exports={openSettings,chooseRecord,setRecordDate};
+async function chooseField(page,field,value){
+ if(['recordType','recordCategory'].includes(field))return chooseRecord(page,field,value);
+ await page.locator('#choose_'+field).click();
+ await page.locator('#recordChoiceRows button[data-value='+JSON.stringify(String(value))+']').click();
+}
+async function setDateField(page,field,value){
+ await page.locator(field==='recordStart'?'#chooseRecordStart':field==='recordEnd'?'#chooseRecordEnd':'#choose_'+field).click();
+ if(!value)await page.locator('#clearRecordDate').click();
+ else{
+  const [year,month]=value.split('-').map(Number);
+  const current=await page.evaluate(()=>({year:recordCalendarYear,month:recordCalendarMonth+1}));
+  if(current.year!==year){await page.locator('#recordCalendarYearSelect').click();await page.locator('#recordChoiceRows button[data-value="'+year+'"]').click()}
+  if(current.month!==month){await page.locator('#recordCalendarMonthSelect').click();await page.locator('#recordChoiceRows button[data-value="'+(month-1)+'"]').click()}
+  await page.locator('#recordCalendarDays button[data-date='+JSON.stringify(value)+']').click();
+ }
+ await page.locator('#confirmRecordDate').click();
+}
+module.exports={openSettings,chooseRecord,setRecordDate,chooseField,setDateField};

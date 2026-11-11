@@ -105,19 +105,8 @@ function balanceEmojiState(){
 }
 const balanceEmojiFiles={happy:'01-smile',nervous:'02-nervous',anxious:'03-anxious',crying:'04-crying'};
 const balanceEmojiLabels={happy:'开心',nervous:'轻微紧张',anxious:'焦虑',crying:'大哭'};
-const balanceEmojiMotion=matchMedia('(prefers-reduced-motion: reduce)'),failedBalanceGifs=new Set(),failedBalancePngs=new Set();
-function renderBalanceEmoji(){
- const image=$('#balanceEmoji'),kind=balanceEmojiState(),stem=balanceEmojiFiles[kind],label='余额状态：'+balanceEmojiLabels[kind];
- image.dataset.emoji=kind;image.alt=label;image.setAttribute('aria-label',label);
- const extension=balanceEmojiMotion.matches||failedBalanceGifs.has(stem)?'png':'gif',src='./assets/budget-emojis/'+stem+'.'+extension;
- if(extension==='png'&&failedBalancePngs.has(stem)){image.hidden=true;return}
- image.hidden=false;
- if(image.getAttribute('src')!==src){
-  image.onerror=()=>{if(image.getAttribute('src')!==src)return;if(extension==='gif'){failedBalanceGifs.add(stem);renderBalanceEmoji()}else{failedBalancePngs.add(stem);image.hidden=true}};
-  image.src=src;
- }
-}
-if(balanceEmojiMotion.addEventListener)balanceEmojiMotion.addEventListener('change',renderBalanceEmoji);else balanceEmojiMotion.addListener(renderBalanceEmoji);
+const failedBalancePngs=new Set();
+function renderBalanceEmoji(){const image=$('#balanceEmoji'),kind=balanceEmojiState(),stem=balanceEmojiFiles[kind],label='余额状态：'+balanceEmojiLabels[kind],src='./assets/budget-emojis/'+stem+'.png';image.dataset.emoji=kind;image.alt=label;image.setAttribute('aria-label',label);image.hidden=failedBalancePngs.has(stem);if(image.getAttribute('src')!==src){image.onerror=()=>{if(image.getAttribute('src')===src){failedBalancePngs.add(stem);image.hidden=true}};image.src=src}}
 function showBalanceEmojiMode(){
  const absolute=$('#emojiMode').value==='absolute';$('#emojiPercentFields').hidden=absolute;$('#emojiAmountFields').hidden=!absolute;
  $('#emojiModeLabel').textContent=absolute?'按绝对金额':'按月预算剩余';
