@@ -125,3 +125,11 @@ dialog>.dialoghead{flex-shrink:0}dialog>.modal-scroll{flex:1;min-height:0;overfl
 #chooseMonthStart{margin-top:0}
 @media(min-height:601px) and (max-height:720px){.app{gap:3px}}
 @media(max-height:600px){.app{gap:1px}}
+
+/* The 32px status lives beside the balance label, preserving the full number row. */
+.balance-heading{display:inline-flex;align-items:center;gap:6px;min-width:0}.balance-label{height:32px;min-height:32px}.balance-heading #balanceEmoji{display:block;width:32px;height:32px;min-width:32px;object-fit:contain;pointer-events:none}.balance-heading #balanceEmoji[hidden]{display:none}.emoji-error{color:#a33c40;font-size:12px}.emoji-error:empty{display:none}#balanceEmojiForm{margin-top:10px}#balanceEmojiForm h3{margin-top:12px}#emojiRuleHint{margin-bottom:8px}
+@media(min-height:601px) and (max-height:720px){.app{gap:1px}}
+@media(max-height:600px){.app{gap:0}.entry-area .amountline{height:32px;align-items:center}.amountline output{line-height:1.05}}
+
+.monthline{font-size:11px}.monthline .month-scope{flex:none}
+@media(max-height:600px){.entry-area .amountline{height:30px}.amountline output{line-height:1}.amountline>span:first-child{line-height:1}}

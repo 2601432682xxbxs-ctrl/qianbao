@@ -2,11 +2,11 @@
 
 面向大学生日常使用的本地记账 PWA，适配 iPhone，支持离线记账。
 
-## 3.4 自定义账月 · 离线缓存 v26
+## 3.5 余额表情 · 离线缓存 v27
 
-3.4 新增设置 → 预算与固定支出 → 每月起始日，复用日历弹窗，选择 1–28 日后确认。首页、月总结、预算、年度总览与 CSV 本月范围统一按账月计算；默认 5 号（账月为每月 5 日–下月 4 日）。`monthStartDay` 随 version 1 JSON 备份，旧备份恢复默认 5，不修改账单。离线缓存同步为 v26，仍为 50 个文件。
+3.4 新增设置 → 预算与固定支出 → 每月起始日，复用日历弹窗，选择 1–28 日后确认。首页、月总结、预算、年度总览与 CSV 本月范围统一按账月计算；默认 5 号（账月为每月 5 日–下月 4 日）。`monthStartDay` 随 version 1 JSON 备份，旧备份恢复默认 5，不修改账单。3.5 离线缓存同步为 v27，共 58 个文件（含新增4组GIF/PNG）。
 
-3.3 合并 GitHub 新版的日历、年度总览、目标、往来、常用筛选和提醒，以及本地 3.2 的分组设置、预算快捷按钮、固定弹窗、日期确认选择与离线更新修复。真实离线进度包含50个文件。
+3.3 合并 GitHub 新版的日历、年度总览、目标、往来、常用筛选和提醒，以及本地 3.2 的分组设置、预算快捷按钮、固定弹窗、日期确认选择与离线更新修复。真实离线进度包含58个文件。
 
 在 2.8 基础上加入以下功能，保留“小布的记账本”名称、本地存储键 `lanyu-ledger-v1` 和 version 1 JSON。无后端、无账号、不上传数据，所有功能离线可用。
 
@@ -57,7 +57,7 @@ Windows 也可双击 `启动局域网.cmd`。
 
 ## 验证范围
 
-`tests/batch3.cjs` 覆盖 2.9 十项功能、时间和统计边界、目标及往来编辑/删除、JSON 新旧备份往返、旧账单保持、三种视口与 JS 运行错误。`tests/batch2.cjs` 保留 2.8 回归，`tests/integration3.cjs` 覆盖缓存优先启动、离线修复与 50 项缓存进度。测试先请求拦截加载，等待 v21 缓存后取消拦截并断网重载，后续操作均离线进行。
+`tests/batch3.cjs` 覆盖 2.9 十项功能、时间和统计边界、目标及往来编辑/删除、JSON 新旧备份往返、旧账单保持、三种视口与 JS 运行错误。`tests/batch2.cjs` 保留 2.8 回归，`tests/integration3.cjs` 覆盖缓存优先启动、离线修复与 58 项缓存进度。测试先请求拦截加载，等待 v21 缓存后取消拦截并断网重载，后续操作均离线进行。
 
 需要 Node.js、Playwright 和 Chromium。在一个终端运行 `python3 -m http.server 8765 --bind 127.0.0.1 --directory public`，另一个运行 `node tests/batch3.cjs` 和 `node tests/integration3.cjs`；可通过 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`CHROMIUM_ARGS`（JSON 数组）指定依赖。
 
@@ -76,7 +76,7 @@ node tests/batch3.cjs
 node tests/integration3.cjs
 ```
 
-`integration3.cjs`覆盖预算计费排除转账/储蓄、组合筛选、六个月图表、50项缓存进度、缺失文件修复、图片/预算/模板备份保留、PIN离线解锁和三种手机尺寸。可用`APP_TEST_URL`指定测试地址，`REPORT_PATH`保存JSON结果，`SHOT_DIR`保存界面截图。
+`integration3.cjs`覆盖预算计费排除转账/储蓄、组合筛选、六个月图表、58项缓存进度、缺失文件修复、图片/预算/模板备份保留、PIN离线解锁和三种手机尺寸。可用`APP_TEST_URL`指定测试地址，`REPORT_PATH`保存JSON结果，`SHOT_DIR`保存界面截图。
 
 
 ## 3.3 界面与验证
@@ -96,3 +96,24 @@ iPhone Safari真机与照片选择仍需手机复测；自动测试使用独立�
 新增 `tests/batch5.cjs` 覆盖日历选择与确认、29–31 日拒绝保存、10 号账月统计与跨年边界、1 号自然月兼容、28 号和闰月、JSON 往返和旧备份、账单不变、三种视口和 v26 离线重载。回归继续使用 `tests/batch2.cjs`、`tests/batch3.cjs`、`tests/integration3.cjs`、`tests/ui33.cjs`。
 
 测试需启动 public/ 本地静态服务（127.0.0.1:8765），并安装 Playwright/Chromium；可用 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`CHROMIUM_ARGS` 配置环境。
+
+
+## 3.5 余额表情用法
+
+首页“总余额”旁显示32px状态图，金额数字保留完整的一行。使用仓库已有4张GIF；图片加载失败自动换成同名PNG。系统开启“减弱动态效果”时直接使用PNG，运行中切换偏好也会更新。
+
+默认方案为“按月预算剩余”：当前账月的剩余比例≥50%为开心、≥20%为紧张、≥5%为焦虑，其余（含超预算）为大哭；花费沿用budgetExpense口径，排除内部转账、储蓄、退款。未设置月总预算时自动按全部账单累计余额判断：≥1000/500/200元依次切换前三档，其余及负数为大哭。
+
+设置→外观颜色→余额表情，可选择“按月预算剩余”或“按绝对金额”，分别修改三档分界并保存。百分比必须为1–99且严格递减；金额以元输入，必须不小于0、最多两位小数且严格递减。非法输入在原表单提示，设置不保存。设置是可选的`state.balanceEmoji`字段（`mode`、`percent`、整数分`amountCents`），随v1 JSON备份导出；旧备份恢复使用默认值，不改动已有账单。
+
+`public/sw.js`和`public/pwa.js`均为`lanyu-shell-v27`，完整缓存58项。8个GIF/PNG纳入缓存，`emoji-pack.zip`不进入界面或缓存；原始9个资源文件保持逐字节不变。
+
+### 验收
+
+在public目录运行`python3 -m http.server 8765 --bind 127.0.0.1`，安装Playwright后运行`node tests/batch6.cjs`。沿用`PLAYWRIGHT_MODULE`和`CHROMIUM_PATH`；`CHROMIUM_ARGS`可传JSON数组添加本机WebGL参数（例如`["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"]`），脚本也包含SwiftShader兼容开关。`ARTIFACT_DIR`和`REPORT_PATH`可选，用于截图和JSON结果。
+
+自动验收覆盖：两种模式全部边界、无总预算回退、记账/删账/改预算立即刷新、自定义阈值与非法输入、v1备份往返及旧备份默认值、四张GIF断网解码、GIF坏缓存离线回退PNG、减弱动态效果，以及三种手机视口。另回归了batch2、batch3、batch5、integration3、ui33。
+
+### 资源与环境限制
+
+Chromium可以解码显示这4张GIF，但Pillow对原始GIF逐帧完整解码均报`broken data stream`；原始emoji-pack.zip也无法通过ZIP完整性检查。按要求未修改、重画或重新生成原始资源，因此不能宣称完整动画循环已验证。4张PNG完整解码通过，浏览器图片加载失败时会回退静图。iPhone Safari真机和真实iOS减弱动态设置尚未实测。

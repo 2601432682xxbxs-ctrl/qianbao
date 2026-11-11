@@ -79,3 +79,78 @@ $('#loanForm').onsubmit=e=>{e.preventDefault();const name=$('#loanName').value.t
 // Keep secondary views fresh after edits, restores, and each minute's local-date check.
 const render28=render;render=function(){render28();if($('#statsDialog').open)renderStats();renderEvening();renderSavedFilters();if($('#calendarDialog').open)renderCalendar();if($('#annualDialog').open)renderAnnual();if($('#goalsDialog').open)renderGoals();if($('#loansDialog').open)renderLoans()};
 setInterval(()=>render(),60000);render();renderSafety();
+
+/* Balance emoji settings extend v1 backups without changing any existing entries. */
+const BALANCE_EMOJI_DEFAULTS=Object.freeze({mode:'budget',percent:[50,20,5],amountCents:[100000,50000,20000]});
+function validateBalanceEmoji(value){
+ if(value===undefined)return structuredClone(BALANCE_EMOJI_DEFAULTS);
+ const descending=values=>Array.isArray(values)&&values.length===3&&values[0]>values[1]&&values[1]>values[2];
+ if(!value||!['budget','absolute'].includes(value.mode)||!descending(value.percent)||value.percent.some(n=>typeof n!=='number'||!Number.isFinite(n)||n<1||n>99)||!descending(value.amountCents)||value.amountCents.some(n=>!Number.isSafeInteger(n)||n<0))throw Error('余额表情分界值无效：请填写从高到低的三档数值');
+ return {mode:value.mode,percent:[...value.percent],amountCents:[...value.amountCents]};
+}
+function balanceEmojiSettings(){try{return validateBalanceEmoji(state.balanceEmoji)}catch{return structuredClone(BALANCE_EMOJI_DEFAULTS)}}
+const extrasBeforeBalanceEmoji=validateExtras;
+validateExtras=function(data){return {...extrasBeforeBalanceEmoji(data),balanceEmoji:validateBalanceEmoji(data.balanceEmoji)}};
+function balanceEmojiState(){
+ const settings=balanceEmojiSettings(),budget=normalizeBudgets(state.budgets).total;
+ let level;
+ if(settings.mode==='budget'&&budget){
+  const spent=budgetExpense(state.entries.filter(entry=>inLedgerMonth(entry,currentMonth()))),remaining=budget-spent;
+  level=settings.percent.findIndex(threshold=>remaining*100>=budget*threshold);
+ }else{
+  const sum=totals(state.entries),balance=sum.income-sum.expense;
+  level=settings.amountCents.findIndex(threshold=>balance>=threshold);
+ }
+ return ['happy','nervous','anxious','crying'][level<0?3:level];
+}
+const balanceEmojiFiles={happy:'01-smile',nervous:'02-nervous',anxious:'03-anxious',crying:'04-crying'};
+const balanceEmojiLabels={happy:'开心',nervous:'轻微紧张',anxious:'焦虑',crying:'大哭'};
+const balanceEmojiMotion=matchMedia('(prefers-reduced-motion: reduce)'),failedBalanceGifs=new Set(),failedBalancePngs=new Set();
+function renderBalanceEmoji(){
+ const image=$('#balanceEmoji'),kind=balanceEmojiState(),stem=balanceEmojiFiles[kind],label='余额状态：'+balanceEmojiLabels[kind];
+ image.dataset.emoji=kind;image.alt=label;image.setAttribute('aria-label',label);
+ const extension=balanceEmojiMotion.matches||failedBalanceGifs.has(stem)?'png':'gif',src='./assets/budget-emojis/'+stem+'.'+extension;
+ if(extension==='png'&&failedBalancePngs.has(stem)){image.hidden=true;return}
+ image.hidden=false;
+ if(image.getAttribute('src')!==src){
+  image.onerror=()=>{if(image.getAttribute('src')!==src)return;if(extension==='gif'){failedBalanceGifs.add(stem);renderBalanceEmoji()}else{failedBalancePngs.add(stem);image.hidden=true}};
+  image.src=src;
+ }
+}
+if(balanceEmojiMotion.addEventListener)balanceEmojiMotion.addEventListener('change',renderBalanceEmoji);else balanceEmojiMotion.addListener(renderBalanceEmoji);
+function showBalanceEmojiMode(){
+ const absolute=$('#emojiMode').value==='absolute';$('#emojiPercentFields').hidden=absolute;$('#emojiAmountFields').hidden=!absolute;
+ $('#emojiModeLabel').textContent=absolute?'按绝对金额':'按月预算剩余';
+ $('#emojiRuleHint').textContent=absolute?'按全部账单累计余额切换，金额单位为元，三档从高到低。':'按当前账月的总预算剩余比例切换。未设总预算时，使用绝对金额分界。百分比为 1–99，三档从高到低。';
+}
+function loadBalanceEmojiSettings(){
+ const settings=balanceEmojiSettings();$('#emojiMode').value=settings.mode;
+ for(let i=0;i<3;i++){$('#emojiPercent'+i).value=settings.percent[i];$('#emojiAmount'+i).value=(settings.amountCents[i]/100).toFixed(2)}
+ $('#emojiSettingsError').textContent='';showBalanceEmojiMode();
+}
+$('#chooseEmojiMode').onclick=()=>{
+ $('#recordChoiceTitle').textContent='余额表情方案';$('#recordChoiceRows').replaceChildren();
+ for(const [value,label]of [['budget','按月预算剩余'],['absolute','按绝对金额']]){
+  const selected=value===$('#emojiMode').value,button=node('button','vertical-choice'+(selected?' selected':''));button.type='button';button.dataset.value=value;button.setAttribute('aria-pressed',String(selected));button.append(node('span','',label),node('small','',selected?'✓':''));
+  button.onclick=()=>{$('#emojiMode').value=value;showBalanceEmojiMode();$('#recordChoiceDialog').close()};$('#recordChoiceRows').append(button);
+ }
+ $('#recordChoiceDialog').showModal();$('#recordChoiceDialog .modal-scroll').scrollTop=0;
+};
+$('#balanceEmojiForm').onsubmit=event=>{
+ event.preventDefault();
+ try{
+  const percent=[],amountCents=[];
+  for(let i=0;i<3;i++){
+   const p=$('#emojiPercent'+i).value.trim(),a=$('#emojiAmount'+i).value.trim();if(!p||!a)throw Error('请完整填写两种方案的三档分界值');
+   const amount=Number(a),cents=Math.round(amount*100);if(!Number.isFinite(amount)||amount<0||!Number.isSafeInteger(cents)||Math.abs(amount*100-cents)>0.000001)throw Error('金额应不小于 0，最多保留两位小数');
+   percent.push(Number(p));amountCents.push(cents);
+  }
+  const settings=validateBalanceEmoji({mode:$('#emojiMode').value,percent,amountCents});
+  if(persist({...state,balanceEmoji:settings})){$('#emojiSettingsError').textContent='';render();toast('余额表情设置已保存')}
+ }catch(error){$('#emojiSettingsError').textContent=error.message}
+};
+const openSettingsBeforeBalanceEmoji=$('#openSettings').onclick;
+$('#openSettings').onclick=()=>{loadBalanceEmojiSettings();openSettingsBeforeBalanceEmoji()};
+const renderBeforeBalanceEmoji=render;
+render=function(){renderBeforeBalanceEmoji();renderBalanceEmoji()};
+loadBalanceEmojiSettings();renderBalanceEmoji();
