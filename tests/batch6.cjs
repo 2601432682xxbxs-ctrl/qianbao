@@ -26,7 +26,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
   });
   await page.clock.install({time:new Date('2026-11-11T12:00:00+08:00')});await page.goto(url);await page.waitForFunction(()=>$('#offlineStatus').dataset.ready==='true');
   report.cache=await page.evaluate(async()=>{const status=await offlineProbe(),cache=await caches.open(status.version);return {...status,zipCached:!!await cache.match('./assets/budget-emojis/emoji-pack.zip'),emojiFiles:(await cache.keys()).filter(r=>r.url.includes('/budget-emojis/')).length}});
-  assert.equal(report.cache.version,'lanyu-shell-v33');assert.equal(report.cache.total,59);assert.equal(report.cache.ready,true);assert.equal(report.cache.emojiFiles,4);assert.equal(report.cache.zipCached,false);assert.equal(await page.locator('#offlineProgress').getAttribute('max'),'59');
+  assert.equal(report.cache.version,'lanyu-shell-v34');assert.equal(report.cache.total,62);assert.equal(report.cache.ready,true);assert.equal(report.cache.emojiFiles,4);assert.equal(report.cache.zipCached,false);assert.equal(await page.locator('#offlineProgress').getAttribute('max'),'62');
   await page.unroute(url+'**');await context.setOffline(true);await page.reload();await page.waitForFunction(()=>$('#offlineStatus').dataset.ready==='true');report.offline=true;
   await resetSettings();report.budgetBoundaries=[];
   for(const [remaining,expected]of [[100,'happy'],[50,'happy'],[49.99,'nervous'],[20,'nervous'],[19.99,'anxious'],[5,'anxious'],[4.99,'crying'],[0,'crying'],[-10,'crying']]){await setRemaining(remaining);assert.equal(await readEmoji(),expected,'budget remaining '+remaining);report.budgetBoundaries.push({remaining,expected})}
@@ -62,7 +62,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
    }
   }
   if(process.env.ARTIFACT_DIR){await page.evaluate(()=>{$('#toast').hidden=true;document.activeElement?.blur()});await page.waitForTimeout(250);await page.screenshot({path:path.join(process.env.ARTIFACT_DIR,'余额表情3.5-首页.png')})}
-  report.staticAssetsOnly=await page.evaluate(async()=>{const c=await caches.open('lanyu-shell-v33');return !(await c.keys()).some(request=>request.url.endsWith('.gif'))});assert.equal(report.staticAssetsOnly,true);
+  report.staticAssetsOnly=await page.evaluate(async()=>{const c=await caches.open('lanyu-shell-v34');return !(await c.keys()).some(request=>request.url.endsWith('.gif'))});assert.equal(report.staticAssetsOnly,true);
   assert.deepEqual(errors,[]);report.errors=errors;if(process.env.REPORT_PATH)fs.writeFileSync(process.env.REPORT_PATH,JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
  }finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exit(1)});

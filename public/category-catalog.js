@@ -1,7 +1,7 @@
 /* Existing string category keys are retained as IDs. All surfaces use this mapping. */
 globalThis.CategoryCatalog=(()=>{
  const base='./assets/category-icons/';
- const files=['meal-staple','snacks','drinks','group-dining','shopping-clothing','shopping-food','shopping-electronics','daily-supplies','public-transport','intercity-travel','daily-entertainment','entertainment-venue','housing-utilities','healthcare','fitness','education','bus','metro','high-speed-rail','airplane','car','travel-hotel','subscription','telecom','pet','personal-care','gifts','home-repair','salary','refund','savings','transfer','generic','living-allowance','other-income','scholarship','gym-membership','fitness-supplements'];
+ const files=['meal-staple','snacks','drinks','group-dining','shopping-clothing','shopping-food','shopping-electronics','daily-supplies','public-transport','intercity-travel','daily-entertainment','entertainment-venue','housing-utilities','healthcare','fitness','education','bus','metro','high-speed-rail','airplane','car','travel-hotel','subscription','telecom','pet','personal-care','gifts','home-repair','salary','refund','savings','transfer','generic','living-allowance','other-income','scholarship','gym-membership','fitness-supplements','ai-category','ai-balance-topup','ai-membership-topup'];
  const names={
   '吃饭':'meal-staple','主食':'meal-staple','米饭':'meal-staple','面条':'meal-staple','食堂':'meal-staple','外卖':'meal-staple','校外就餐':'meal-staple','早餐':'meal-staple',
   '小吃':'snacks','炸鸡':'snacks','烤串':'snacks','零食':'snacks','奶茶饮品':'drinks','饮品':'drinks','奶茶':'drinks','咖啡':'drinks','果汁':'drinks','聚餐':'group-dining',
@@ -10,12 +10,12 @@ globalThis.CategoryCatalog=(()=>{
   '居住水电':'housing-utilities','医疗健康':'healthcare','医疗':'healthcare','运动健身':'fitness','健身':'fitness','学习教育':'education','学习':'education','教育':'education','书籍':'education',
   '公交':'bus','地铁':'metro','高铁':'high-speed-rail','火车':'high-speed-rail','飞机':'airplane','打车':'car','用车':'car','旅行住宿':'travel-hotel','住宿':'travel-hotel','会员订阅':'subscription','话费网费':'telecom','宠物':'pet','个护':'personal-care','礼物人情':'gifts','家居维修':'home-repair','工资':'salary','兼职':'salary','退款':'refund','储蓄':'savings','转账':'transfer'
  };
- Object.assign(names,{'健身卡':'gym-membership','补剂':'fitness-supplements','水费':'housing-utilities','生活费':'living-allowance','其他收入':'other-income','奖学金':'scholarship','娱乐':'daily-entertainment','日常生活':'daily-supplies','个人护肤品':'personal-care','礼物':'gifts'});
+ Object.assign(names,{'AI':'ai-category','ai':'ai-category','Ai':'ai-category','aI':'ai-category','金额充值':'ai-balance-topup','AI会员卡充值':'ai-membership-topup','健身卡':'gym-membership','补剂':'fitness-supplements','水费':'housing-utilities','生活费':'living-allowance','其他收入':'other-income','奖学金':'scholarship','娱乐':'daily-entertainment','日常生活':'daily-supplies','个人护肤品':'personal-care','礼物':'gifts'});
  const labels={'吃饭':'主食','奶茶饮品':'饮品'};
  const requestedPresets={'娱乐':['日常娱乐','娱乐场馆'],'医疗健康':[],'运动健身':[],'学习教育':[],'旅行住宿':[],'日常生活':['会员订阅','话费网费','个人护肤品','礼物']};
  // Apply once per ledger so a user's later deletions stay deleted.
  function addRequestedPresets(ledger){
-  if(ledger.categoryPresetsVersion>=3)return ledger;
+  if(ledger.categoryPresetsVersion>=4)return ledger;
   const categories=structuredClone(ledger.categories);
   const has=name=>Object.entries(categories).some(([key,subs])=>key===name||subs.includes(name));
   if(!(ledger.categoryPresetsVersion>=1))for(const [parent,children] of Object.entries(requestedPresets)){
@@ -24,8 +24,9 @@ globalThis.CategoryCatalog=(()=>{
    if(missing.length){if(!Object.hasOwn(categories,parent))categories[parent]=[];categories[parent].push(...missing)}
   }
   if(!(ledger.categoryPresetsVersion>=2)){if(!Object.hasOwn(categories,'日常生活'))categories['日常生活']=[];if(!categories['日常生活'].includes('水费'))categories['日常生活'].push('水费')}
-  const fitness=['运动健身','健身'].find(name=>Object.hasOwn(categories,name))||'运动健身';if(!Object.hasOwn(categories,fitness))categories[fitness]=[];for(const sub of ['健身卡','补剂'])if(!categories[fitness].includes(sub))categories[fitness].push(sub);
-  return {...ledger,categories,categoryPresetsVersion:3};
+  if(!(ledger.categoryPresetsVersion>=3)){const fitness=['运动健身','健身'].find(name=>Object.hasOwn(categories,name))||'运动健身';if(!Object.hasOwn(categories,fitness))categories[fitness]=[];for(const sub of ['健身卡','补剂'])if(!categories[fitness].includes(sub))categories[fitness].push(sub);}
+  const ai=Object.keys(categories).find(name=>name.toLowerCase()==='ai')||'AI';if(!Object.hasOwn(categories,ai))categories[ai]=[];for(const sub of ['金额充值','AI会员卡充值'])if(!categories[ai].includes(sub))categories[ai].push(sub);
+  return {...ledger,categories,categoryPresetsVersion:4};
  }
  const income={'生活费':[],'兼职':[],'奖学金':[],'其他收入':[],'工资':[],'退款':[]};
  const groups=[{id:'public',label:'公共交通',icon:'public-transport',children:['公交','地铁'],legacy:['公交地铁','公共交通']},{id:'intercity',label:'城际出行',icon:'intercity-travel',children:['高铁','飞机'],legacy:['火车高铁','城际出行']}];
